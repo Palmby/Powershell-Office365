@@ -17,6 +17,7 @@
 #$vault = New-Object Windows.Security.Credentials.PasswordVault
 
 ###**This is where you start adding the creds***
+#$cred = New-Object Windows.Security.Credentials.PasswordVault
 #$cred.Resource = '*Descriptive name*'
 #$cred.Username = '*input the username here*'
 #$cred.Password = '*Password for account*'
@@ -47,7 +48,7 @@ $cs.password
 $securepassword = $cs.password | ConvertTo-SecureString -AsPlainText -Force
 
 #turn creds into an Object
-$azurecreds = New-object System.Management.Automation.PSCredential ("$cs.username" , $securepassword)
+$azurecreds = New-object System.Management.Automation.PSCredential ($cs.username , $securepassword)
 
 
 $logincreds = Get-Credential -Credential $azurecreds
