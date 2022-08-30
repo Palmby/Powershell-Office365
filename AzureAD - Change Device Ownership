@@ -41,7 +41,7 @@ Connect-AzureAD
 
 
 #get-objectid of Device 
-$device = read-host -Prompt 'Input the Device name here'
+$device = Read-Host -Prompt 'Input the Device name here'
 
 try
 {
@@ -50,21 +50,41 @@ try
 
 catch 
 {
-    write-output "Device was not found"
+    write-output "Device was not found, please rerun script with correct device"
+}
+# Device ID
+$DeviceID = ($device).ObjectID
+
+
+
+
+#code here for another day
+$dID = ($device).objectId
+$currentowner = get-azureaddeviceregisteredowner -objectid $dID
+$currentownerdisplay = ($currentowner).displayname
+write-output = "Current owner is $currentownerdisplay"
+#current users ObjectID
+$currentuserID = ($currentowner).objectID
+
+#get-objectID of old new owner
+$newuser = Read-Host -prompt 'Please state the email address of the new user'
+
+try
+{
+    $newuser = Get-AzureADUser | where-object {$_.UserPrincipalName -eq $newuser} -ErrorAction Inquire
 }
 
-$device | select -objectid
+catch
+{
+    write-output "User was not found, please rerun script with correct device"
+}
 
-#get-objectID of new owner
-#code here for another day
-$newowner = 'insert object id here'
-
-#get-objectID of old owner
-#code here for another day
-$oldowner = 'insert ovject id here'
-
+$NewOwnerID = ($newuser).ObjectID
 #add new owner to device
-#Add-AzureADDeviceRegisteredOwner -objectid $deviceID -refObjectID $newowner
+Add-AzureADDeviceRegisteredOwner -objectid $deviceID -refObjectID $newownerID
 
 #remove owner to device
-#Remove-AzureADDeviceRegisteredOwner -objectid $deviceID -OwnerID $oldowner
+Remove-AzureADDeviceRegisteredOwner -objectid $deviceID -OwnerID $currentuserID
+
+Write-Output "Owner has been changed, closing"
+exit
