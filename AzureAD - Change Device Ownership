@@ -1,0 +1,70 @@
+#Change Azure Joined Device Ownership
+param([switch]$Elevated)
+function Test-Admin {
+    $currentUser = New-Object Security.Principal.WindowsPrincipal $([Security.Principal.WindowsIdentity]::GetCurrent())
+    $currentUser.IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
+}
+
+if ((Test-Admin) -eq $false)  {
+    if ($elevated) {
+        # tried to elevate, did not work, aborting
+    } else {
+        Start-Process powershell.exe -Verb RunAs -ArgumentList ('-noprofile -noexit -file "{0}" -elevated' -f ($myinvocation.MyCommand.Definition))
+    }
+    
+}
+
+'Script running in elevated mode'
+
+
+if (-Not (Get-Module -ListAvailable -Name AzureADpreview)) {
+
+    $install = Read-Host 'The AzureAD PowerShell module is not installed. Do you want to install it now? (Y/n)'
+
+    if($install -eq '' -Or $install -eq 'Y' -Or $install -eq 'Yes'){
+        If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] “Administrator”))
+        {
+            Write-Warning “Administrator permissions are needed to install the AzureAD PowerShell module.`nPlease re-run this script as an Administrator.”
+            Exit
+        }
+
+        write-host "Installing"
+        Install-Module -Name AzureADpreview
+    }
+    else {
+        exit
+    }
+}
+
+
+Connect-AzureAD
+
+
+#get-objectid of Device 
+$device = read-host -Prompt 'Input the Device name here'
+
+try
+{
+   $device =  Get-AzureADDevice | where-object {$_.Displayname -eq $device} -ErrorAction Inquire
+}
+
+catch 
+{
+    write-output "Device was not found"
+}
+
+$device | select -objectid
+
+#get-objectID of new owner
+#code here for another day
+$newowner = 'insert object id here'
+
+#get-objectID of old owner
+#code here for another day
+$oldowner = 'insert ovject id here'
+
+#add new owner to device
+#Add-AzureADDeviceRegisteredOwner -objectid $deviceID -refObjectID $newowner
+
+#remove owner to device
+#Remove-AzureADDeviceRegisteredOwner -objectid $deviceID -OwnerID $oldowner
