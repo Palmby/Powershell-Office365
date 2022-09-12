@@ -18,6 +18,7 @@ $object = New-Object -TypeName PSObject -propert $prop
 
 foreach ($o in $object)
 {
+    $user = $o.name
     write-output $o | ConvertTo-Json | out-file C:\temp\$o.DisplayName.json 
 }    
 
