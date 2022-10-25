@@ -12,29 +12,30 @@ $Azureconnection = @{
 Connect-azuread @Azureconnection 
 
 
-$users = get-azureaduser -all $true | where {$_.accountenabled -eq $false} | select *
+$users = get-azureaduser -all $true | where {$_.accountenabled -eq $false} 
 
 foreach ($user in $users)
 {
     $objectID = $user.ObjectID
-    $groups = Get-AzureADuserMember -ObjectId "$objectID"
+   $license = $user.AssignedLicenses
+   $groups = Get-AzureADUserMembership -ObjectId "$objectID" | select Mail
+   $mail = $groups.Mail
+$mail
+
 
 
     foreach ($u in $user)
     {
         $prop =  @{
 
-            'User' = $u
-            'Groups' = $groups -join ',' 
-            'AssignedLicense' = $u.AssignedLicense
+            'User' = $u.DisplayName
+            'Groups' = $mail -join ',' 
+            'AssignedLicense' = $license
 
             }
 
 
             $obj = new-Object -TypeName PSObject -Property $prop
-            $obj | Select-Object User, group |sort-object User | export-csv C:\temp\MCA_disabledusers.csv -NoTypeInformation -Append -Force
+            $obj | Select-Object User, groups, AssignedLicense |sort-object User | export-csv C:\temp\MCA_disabledusers.csv -NoTypeInformation -Append -Force
 
     }
-
-
-}
