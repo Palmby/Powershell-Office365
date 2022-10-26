@@ -5,10 +5,6 @@ $Azureconnection = @{
             CertificateThumbprint = ''
 }
 
-
-
-
-
 Connect-azuread @Azureconnection 
 
 
@@ -16,21 +12,29 @@ $users = get-azureaduser -all $true | where {$_.accountenabled -eq $false}
 
 foreach ($user in $users)
 {
-    $objectID = $user.ObjectID
-   $license = $user.AssignedLicenses
+$objectID = $user.ObjectID
+   $license = $user.AssignedLicenses -join ','
    $groups = Get-AzureADUserMembership -ObjectId "$objectID" | select Mail
    $mail = $groups.Mail
-$mail
+   
+if ([string]::IsNullOrEmpty($license))
+{
+    $islicensed = 'y'
+}
+
+else
+{
+    $islicensed = 'n'
+}
 
 
-
-    foreach ($u in $user)
+foreach ($u in $user)
     {
         $prop =  @{
 
             'User' = $u.DisplayName
             'Groups' = $mail -join ',' 
-            'AssignedLicense' = $license
+            'AssignedLicense' = $islicensed
 
             }
 
@@ -39,3 +43,6 @@ $mail
             $obj | Select-Object User, groups, AssignedLicense |sort-object User | export-csv C:\temp\MCA_disabledusers.csv -NoTypeInformation -Append -Force
 
     }
+
+
+}
