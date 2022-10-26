@@ -19,12 +19,12 @@ $objectID = $user.ObjectID
    
 if ([string]::IsNullOrEmpty($license))
 {
-    $islicensed = 'y'
+    $islicensed = 'n'
 }
 
 else
 {
-    $islicensed = 'n'
+    $islicensed = 'y'
 }
 
 
