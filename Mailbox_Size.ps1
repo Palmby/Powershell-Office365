@@ -1,6 +1,11 @@
-﻿###############Grabs all users in a tenant and gets their mailbox size#####################
+###############Grabs all users in a tenant and gets their mailbox size#####################
 
-Connect-ExchangeOnline
+$connection = @{
+AppID = ""
+Organization = ".onmicrosoft.com"
+CertificateThumbprint = ''
+}
 
-get-mailbox | get-mailboxstatistics | ft displayname, totalitemsize | out-file C:\temp\mailboxsize.txt
-#get-mailbox | get-mailboxstatistics | sort-object TotalItemSize -ascending | Select DisplayName, TotalitemSize
+Connection-exchangeonline @connection
+  
+Get-Mailbox | Get-MailboxStatistics  | Select-Object DisplayName, totalitemsize, @{Name="TotalItemSizeMB"; Expression={[math]::Round(($_.TotalItemSize.ToString().Split("(")[1].Split(" ")[0].Replace(",","")/1MB),0)}} | sort-object  "TotalItemSizeMB" | export-csv   
