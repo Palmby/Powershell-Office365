@@ -9,3 +9,8 @@ $body = #"EmailBody"
 $attachment =#"attachment"
 
 send-mailmessage -To "" -from "" -Subject $subject -Body $body -BodyAsHtml -Attachments $attachment -SmtpServer smtp.office365.com -usessl -Credential $cred -Port 587
+<<<<<<< Updated upstream
+=======
+
+
+>>>>>>> Stashed changes
