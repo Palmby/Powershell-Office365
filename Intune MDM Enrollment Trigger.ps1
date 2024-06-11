@@ -1,7 +1,9 @@
 #pull Tenant information
 $key = 'SYSTEM\CurrentControlSet\Control\CloudDomainJoin\TenantInfo\*'
 
-
+$MDMEnrollmentURL = Get-itemproperty $path -Name MdmEnrollmentUrl
+$MdmTermsOfUseUrl = Get-itemproperty $path -Name MdmTermsOfUseUrl
+$MdMComplianceUrl = Get-itemproperty $path -Name MdmComplianceUrl
 #checks if the Computer is joined to AAD
 try
 {
@@ -34,34 +36,28 @@ else{ }
 
 #------------------------------------------------Check Registry if MDM Keys are present---------------------------------------------------
 #Check for MdmEnrollmentURL
-try
-{
-    Get-itemproperty $path -Name MdmEnrollmentUrl
-}
 
-catch 
+   
+
+if ($MDMEnrollmentURL -eq $null)
 {
+
     New-ItemProperty -LiteralPath $path -Name 'MdmEnrollmentUrl' -Value 'https://enrollment.manage.microsoft.com/enrollmentserver/discovery.svc' -PropertyType String -Force -ea SilentlyContinue
 }
 
 
 #Check for MdmTermsofUseURL
-try
-{
-    Get-itemproperty $path -Name MdmTermsOfUseUrl
-}
 
-catch 
+if ($MdmTermsOfUseUrl -eq $null)
 {
     New-ItemProperty -LiteralPath $path -Name 'MdmTermsOfUseUrl' -Value 'https://portal.manage.microsoft.com/TermsofUse.aspx' -PropertyType String -Force -ea SilentlyContinue;
 }
 #Check for MdMComplianceURL
-try
-{
-    Get-itemproperty $path -Name MdmComplianceUrl
-}
 
-catch 
+
+
+
+if ($MdMComplianceUrl -eq $null)
 {
     New-ItemProperty -LiteralPath $path -Name 'MdmComplianceUrl' -Value 'https://portal.manage.microsoft.com/?portalAction=Compliance' -PropertyType String -Force -ea SilentlyContinue;
 }
